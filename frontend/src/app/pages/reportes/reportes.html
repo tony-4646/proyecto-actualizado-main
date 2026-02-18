@@ -1,0 +1,98 @@
+<div class="container fade-in">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center">
+    <div>
+      <h1>Reportes de Ventas</h1>
+      <p>Visualiza el rendimiento de tu negocio</p>
+    </div>
+    <div class="header-actions" style="display: flex; gap: 0.5rem">
+      <button class="btn btn-success" (click)="exportarExcel()">Excel</button>
+      <button class="btn btn-primary" (click)="exportarPDF()">PDF</button>
+    </div>
+  </div>
+
+  <!-- Selector de Periodo -->
+  <div class="filters">
+    <button class="btn" [class.btn-primary]="periodoActual === 'diario'"
+      (click)="cambiarPeriodo('diario')">Diario</button>
+    <button class="btn" [class.btn-primary]="periodoActual === 'semanal'"
+      (click)="cambiarPeriodo('semanal')">Semanal</button>
+    <button class="btn" [class.btn-primary]="periodoActual === 'mensual'"
+      (click)="cambiarPeriodo('mensual')">Mensual</button>
+  </div>
+
+  <!-- Tarjetas de Resumen -->
+  <div class="dashboard-grid">
+    <div class="card stat-card">
+      <h3>Ventas Totales</h3>
+      <div class="value">{{ resumen?.total_ventas | currency }}</div>
+      <p class="subtitle">{{ getPeriodoLabel() }}</p>
+    </div>
+    <div class="card stat-card">
+      <h3>Transacciones</h3>
+      <div class="value">{{ resumen?.total_transacciones }}</div>
+      <p class="subtitle">Facturas generadas</p>
+    </div>
+    <div class="card stat-card">
+      <h3>IVA Recaudado</h3>
+      <div class="value">{{ resumen?.total_iva | currency }}</div>
+      <p class="subtitle">15% Impuesto</p>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="content-grid">
+    <!-- Gráfico de Ventas (Línea) -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📊 Tendencia de Ventas</h2>
+      </div>
+      <div class="chart-box">
+        <canvas id="ventasChart"></canvas>
+        <div *ngIf="detalleDias.length === 0" class="empty-chart">Sin datos para el periodo</div>
+      </div>
+    </div>
+
+    <!-- Gráfico Top Productos (Donut) -->
+    <div class="card">
+      <div class="card-header">
+        <h2>🏆 Top Productos</h2>
+      </div>
+      <div class="chart-box">
+        <canvas id="topChart"></canvas>
+        <div *ngIf="topProductos.length === 0" class="empty-chart">Sin datos para el periodo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Detalle -->
+  <div class="card">
+    <div class="card-header">
+      <h2>📋 Productos Más Vendidos</h2>
+    </div>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Producto</th>
+            <th>Código</th>
+            <th>Cantidad</th>
+            <th>Ingresos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prod of topProductos; let i = index">
+            <td><strong>{{ i + 1 }}</strong></td>
+            <td>{{ prod.prodnombre }}</td>
+            <td>{{ prod.prodcodigo }}</td>
+            <td>{{ prod.cantidad_vendida }}</td>
+            <td>{{ prod.total_ingresos | currency }}</td>
+          </tr>
+          <tr *ngIf="topProductos.length === 0">
+            <td colspan="5" class="text-center">No hay datos para este periodo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

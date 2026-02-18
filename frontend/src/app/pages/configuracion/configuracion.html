@@ -1,0 +1,56 @@
+<div class="container fade-in">
+    <div class="page-header">
+        <h1>Configuración del Sistema</h1>
+        <p>Administra los datos del negocio</p>
+    </div>
+
+    <div class="card" style="max-width: 700px">
+        <div class="card-header">
+            <h3>Datos de la Empresa</h3>
+        </div>
+
+        <div class="form-grid" *ngIf="!loading">
+            <div class="form-group">
+                <label class="form-label">Nombre de la Empresa</label>
+                <input class="form-control" [(ngModel)]="config.confnombre_empresa" placeholder="Nombre del negocio">
+            </div>
+            <div class="form-group">
+                <label class="form-label">RUC / CI</label>
+                <input class="form-control" [(ngModel)]="config.confruc" placeholder="0000000000001">
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1">
+                <label class="form-label">Dirección</label>
+                <input class="form-control" [(ngModel)]="config.confdireccion" placeholder="Dirección del negocio">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input class="form-control" [(ngModel)]="config.conftelefono" placeholder="0000000000">
+            </div>
+            <div class="form-group">
+                <label class="form-label">IVA (%)</label>
+                <input type="number" class="form-control" [(ngModel)]="config.confiva_porcentaje" min="0" max="100"
+                    step="0.5">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Moneda</label>
+                <select class="form-control" [(ngModel)]="config.confmoneda">
+                    <option value="USD">USD - Dólar</option>
+                    <option value="EUR">EUR - Euro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="p-3" *ngIf="mensaje">
+            <div class="badge" [ngClass]="mensaje.includes('✅') ? 'badge-success' : 'badge-danger'"
+                style="font-size: 0.9rem; padding: 8px 16px;">
+                {{ mensaje }}
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-primary" (click)="guardar()" [disabled]="guardando">
+                {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+        </div>
+    </div>
+</div>
