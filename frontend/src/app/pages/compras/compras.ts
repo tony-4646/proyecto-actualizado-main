@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificacionesService } from '../../services/notificaciones.service';
 
 //METODOS PARA COMPRAS
 
@@ -26,7 +27,7 @@ export class ComprasComponent implements OnInit {
     observacion = '';
     porcentajeIva = 15;
 
-    constructor(private api: ApiService, private auth: AuthService) { }
+    constructor(private api: ApiService, private auth: AuthService, private notifService: NotificacionesService) { }
 
     ngOnInit() {
         this.cargarHistorial();
@@ -171,6 +172,7 @@ export class ComprasComponent implements OnInit {
                 alert(`Compra registrada exitosamente`);
                 this.loading = false;
                 this.volverHistorial();
+                this.notifService.actualizarStock();
             },
             error: (err) => {
                 alert('Error al registrar compra: ' + (err.error?.error || err.message));

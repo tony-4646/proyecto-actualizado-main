@@ -18,33 +18,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (log of logs; track log.audregistro_id) {
-                        <tr>
-                            <td><small>{{ log.audfecha | date:'dd/MM/yyyy HH:mm:ss' }}</small></td>
-                            <td>{{ log.usuusuario || 'Sistema' }}</td>
-                            <td><span class="badge" [ngClass]="getBadge(log.audaccion)">{{ log.audaccion }}</span></td>
-                            <td>{{ log.audtabla }}</td>
-                            <td>{{ log.audregistro_id }}</td>
-                            <td><small>{{ log.auddetalle }}</small></td>
-                        </tr>
-                    } @empty {
-                        @if (!loading) {
-                            <tr>
-                                <td colspan="6" class="text-center p-3">No hay registros de auditoría</td>
-                            </tr>
-                        }
-                    }
+                    <tr *ngFor="let log of logs">
+                        <td><small>{{ log.audfecha | date:'dd/MM/yyyy HH:mm:ss' }}</small></td>
+                        <td>{{ log.usuusuario || 'Sistema' }}</td>
+                        <td><span class="badge" [ngClass]="getBadge(log.audaccion)">{{ log.audaccion }}</span></td>
+                        <td>{{ log.audtabla }}</td>
+                        <td>{{ log.audregistro_id }}</td>
+                        <td><small>{{ log.auddetalle }}</small></td>
+                    </tr>
+                    <tr *ngIf="logs.length === 0 && !loading">
+                        <td colspan="6" class="text-center p-3">No hay registros de auditoría</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
-        @if (total > limit) {
-            <div class="pagination">
-                <button class="btn btn-sm btn-secondary" (click)="anterior()" [disabled]="pagina === 0">← Anterior</button>
-                <span class="pag-info">Página {{ pagina + 1 }} de {{ (total / limit | number:'1.0-0') }}</span>
-                <button class="btn btn-sm btn-secondary" (click)="siguiente()"
-                    [disabled]="(pagina + 1) * limit >= total">Siguiente →</button>
-            </div>
-        }
+        <div class="pagination" *ngIf="total > limit">
+            <button class="btn btn-sm btn-secondary" (click)="anterior()" [disabled]="pagina === 0">← Anterior</button>
+            <span class="pag-info">Página {{ pagina + 1 }} de {{ (total / limit | number:'1.0-0') }}</span>
+            <button class="btn btn-sm btn-secondary" (click)="siguiente()"
+                [disabled]="(pagina + 1) * limit >= total">Siguiente →</button>
+        </div>
     </div>
 </div>

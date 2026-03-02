@@ -105,10 +105,22 @@ export class Productos implements OnInit {
             alert('Seleccione una categoría');
             return;
         }
+
+        if (!this.productoActual.catid || this.productoActual.catid === 'null') {
+            alert('Debe seleccionar una categoría válida de la lista');
+            return;
+        }
+
         if (!this.productoActual.prodcodigo || !this.productoActual.prodnombre) {
             alert('Complete los campos obligatorios');
             return;
         }
+
+        if (this.productoActual.prodminimo === null || this.productoActual.prodminimo < 1) {
+            alert('El stock mínimo debe ser al menos 1');
+            return;
+        }
+
         if (!this.productoActual.prodprecio_venta || this.productoActual.prodprecio_venta <= 0) {
             alert('Ingrese un precio de venta válido');
             return;
@@ -193,6 +205,11 @@ export class Productos implements OnInit {
     asignarProveedor() {
         if (!this.proveedorSeleccionado) {
             alert('Seleccione un proveedor');
+            return;
+        }
+
+        if (this.costoReferencia < 0 || this.diasEntrega < 1) {
+            alert('Verifique que el costo sea >= 0 y los días >= 1');
             return;
         }
 

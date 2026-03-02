@@ -7,7 +7,6 @@
     <div class="search-bar">
         <input type="text" class="form-control" placeholder="Buscar por nombre o código..." [(ngModel)]="filtro"
             (keyup.enter)="buscar()">
-        <button class="btn btn-secondary" (click)="buscar()">Buscar</button>
     </div>
 
     <div class="card">
@@ -90,19 +89,20 @@
                 <div class="form-group">
                     <label class="form-label">Descripción</label>
                     <textarea class="form-control" [(ngModel)]="productoActual.proddescripcion" name="proddescripcion"
-                        rows="2"> </textarea>
+                        rows="2" maxlength="150"> </textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Precio Venta $</label>
                         <input type="number" step="0.01" class="form-control"
-                            [(ngModel)]="productoActual.prodprecio_venta" name="prodprecio_venta">
+                            [(ngModel)]="productoActual.prodprecio_venta" name="prodprecio_venta"
+                            oninput="if(this.value < 0) this.value = 0;">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Stock Mínimo</label>
                         <input type="number" min="0" class="form-control" [(ngModel)]="productoActual.prodminimo"
-                            name="prodminimo">
+                            name="prodminimo" oninput="if(this.value < 1) this.value = 1;">
                     </div>
                 </div>
 
@@ -125,8 +125,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">{{ editando ? 'Guardar Cambios' : 'Crear Producto'
-                        }}</button>
+                    <button type="submit" class="btn btn-primary">{{ editando ? 'Guardar Cambios' : 'Crear Producto' }}</button>
                 </div>
             </form>
         </div>
@@ -135,7 +134,7 @@
     <div class="modal-backdrop" *ngIf="modalProveedoresOpen" (click)="cerrarModalProveedores()">
         <div class="modal" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>🚚 Proveedores de: {{ productoProveedores?.prodnombre }}</h3>
+                <h3>Proveedores de: {{ productoProveedores?.prodnombre }}</h3>
                 <button class="modal-close" (click)="cerrarModalProveedores()">&times;</button>
             </div>
 
@@ -144,42 +143,46 @@
                 <div *ngIf="proveedoresDelProducto.length === 0" class="empty-mini">
                     Este producto no tiene proveedores asignados
                 </div>
+
                 <div *ngFor="let pp of proveedoresDelProducto" class="proveedor-item">
                     <div class="prov-info">
                         <strong>{{ pp.provnombre }}</strong>
                         <small>RUC: {{ pp.provruc }}</small>
+                        <div class="mt-1">
+                            <span class="badge badge-info">Costo: ${{ pp.costo_referencia | number:'1.2-2' }}</span>
+                            <span class="badge badge-secondary">Entrega: {{ pp.dias_entrega }} días</span>
+                        </div>
                     </div>
                     <button class="btn btn-sm btn-danger" (click)="quitarProveedor(pp.ppid)">Quitar</button>
                 </div>
-            </div>
 
-            <div class="asignar-proveedor" *ngIf="proveedoresDisponibles.length > 0">
-                <h4>Agregar proveedor</h4>
-                <div class="form-row">
-                    <div class="form-group">
-                        <select class="form-control" [(ngModel)]="proveedorSeleccionado">
-                            <option [ngValue]="null">-- Seleccionar --</option>
-                            <option *ngFor="let p of proveedoresDisponibles" [ngValue]="p.provid">
-                                {{ p.provnombre }} ({{ p.provruc }})
-                            </option>
-                        </select>
+                <div class="asignar-proveedor" *ngIf="proveedoresDisponibles.length > 0">
+                    <h4>Agregar proveedor</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <select class="form-control" [(ngModel)]="proveedorSeleccionado">
+                                <option [ngValue]="null">-- Seleccionar --</option>
+                                <option *ngFor="let p of proveedoresDisponibles" [ngValue]="p.provid">
+                                    {{ p.provnombre }} ({{ p.provruc }})
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Costo Ref. $</label>
+                            <input type="number" step="0.01" class="form-control" [(ngModel)]="costoReferencia" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Días entrega</label>
+                            <input type="number" min="1" class="form-control" [(ngModel)]="diasEntrega">
+                        </div>
+                        <div class="form-group" style="align-self: flex-end">
+                            <button class="btn btn-primary" (click)="asignarProveedor()">+ Asignar</button>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Costo Ref. $</label>
-                        <input type="number" step="0.01" class="form-control" [(ngModel)]="costoReferencia">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Días entrega</label>
-                        <input type="number" min="1" class="form-control" [(ngModel)]="diasEntrega">
-                    </div>
-                    <div class="form-group" style="align-self: flex-end">
-                        <button class="btn btn-primary" (click)="asignarProveedor()">+ Asignar</button>
-                    </div>
-                </div>
             </div>
-
             <div class="modal-footer">
                 <button class="btn btn-secondary" (click)="cerrarModalProveedores()">Cerrar</button>
             </div>
@@ -218,12 +221,10 @@
                         </tr>
                     </tbody>
                 </table>
-
                 <div *ngIf="kardexData.length === 0" class="empty-state">
-                    No hay movimientos registrados para este producto
+                    No hay movimientos registrados
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button class="btn btn-secondary" (click)="cerrarKardex()">Cerrar</button>
             </div>
@@ -258,12 +259,10 @@
                         </tr>
                     </tbody>
                 </table>
-
                 <div *ngIf="lotesData.length === 0" class="empty-state">
-                    No hay lotes activos para este producto
+                    No hay lotes activos
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button class="btn btn-secondary" (click)="cerrarModalLotes()">Cerrar</button>
             </div>

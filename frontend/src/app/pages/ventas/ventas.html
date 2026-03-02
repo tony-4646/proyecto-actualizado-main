@@ -79,7 +79,7 @@
 
                         <div *ngIf="!clienteSeleccionado" class="search-container">
                             <input type="text" class="form-control" placeholder="Buscar cliente por nombre o CI/RUC..."
-                                [(ngModel)]="busquedaCliente">
+                                [(ngModel)]="busquedaCliente" maxlength="100">
                             <div class="search-results" *ngIf="filtrarClientes().length > 0">
                                 <div *ngFor="let c of filtrarClientes()" class="result-item"
                                     (click)="seleccionarCliente(c)">
@@ -98,7 +98,7 @@
                     <div class="card-body">
                         <div class="search-container">
                             <input type="text" class="form-control" placeholder="Buscar producto por nombre o código..."
-                                [(ngModel)]="busquedaProducto" (input)="buscarProducto()">
+                                [(ngModel)]="busquedaProducto" (input)="buscarProducto()" maxlength="150">
                             <div class="search-results" *ngIf="productosFiltrados.length > 0">
                                 <div *ngFor="let p of productosFiltrados" class="result-item producto-item"
                                     (click)="agregarAlCarrito(p)">

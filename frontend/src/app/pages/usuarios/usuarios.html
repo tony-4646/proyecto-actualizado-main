@@ -85,7 +85,7 @@
                 <div class="form-group">
                     <label class="form-label">Nombre de Usuario *</label>
                     <input type="text" class="form-control" [(ngModel)]="usuarioActual.usuusuario" name="usuusuario"
-                        required placeholder="Ej: cajero2">
+                        required placeholder="Ej: cajero2" maxlength="50">
                 </div>
 
                 <div class="form-group"
@@ -94,11 +94,9 @@
                         {{ editando ? 'Confirmar con Contraseña Actual *' : 'Contraseña *' }}
                     </label>
                     <input type="password" class="form-control" [(ngModel)]="usuarioActual.contrasena" name="contrasena"
-                        required [placeholder]="editando ? 'Ingrese su clave para guardar' : 'Mínimo 5 caracteres'">
-
+                        required [placeholder]="editando ? 'Ingrese su clave para guardar' : 'Mínimo 5 caracteres'" maxlength="50">
                     <small *ngIf="editando" class="text-muted">
-                        {{ auth.rolNombre === 'Administrador' ? 'Confirmación de identidad requerida para cambios en tu
-                        cuenta.' : 'Necesario para confirmar el cambio de nombre.' }}
+                         {{ auth.rolNombre === 'Administrador' ? 'Confirmación de identidad requerida para cambios en tu cuenta.' : 'Necesario para confirmar el cambio de nombre.' }}
                     </small>
                 </div>
 
@@ -136,7 +134,6 @@
         </div>
     </div>
 
-    <!-- Modal Cambiar Contraseña -->
     <div class="modal-backdrop" *ngIf="modalPasswordOpen" (click)="cerrarModalPassword()">
         <div class="modal" (click)="$event.stopPropagation()">
             <div class="modal-header">
@@ -150,19 +147,19 @@
                 <div class="form-group">
                     <label class="form-label">Contraseña Actual *</label>
                     <input type="password" class="form-control" [(ngModel)]="contrasenaActual" name="contrasenaActual"
-                        required placeholder="Ingrese la contraseña actual">
+                        required placeholder="Ingrese la contraseña actual" maxlength="50">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Nueva Contraseña *</label>
                     <input type="password" class="form-control" [(ngModel)]="nuevaContrasena" name="nuevaContrasena"
-                        required placeholder="Mínimo 5 caracteres">
+                        required placeholder="Mínimo 5 caracteres" maxlength="50">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Confirmar Contraseña *</label>
                     <input type="password" class="form-control" [(ngModel)]="confirmarContrasena"
-                        name="confirmarContrasena" required placeholder="Repita la contraseña">
+                        name="confirmarContrasena" required placeholder="Repita la contraseña" maxlength="50">
                 </div>
 
                 <div class="modal-footer">

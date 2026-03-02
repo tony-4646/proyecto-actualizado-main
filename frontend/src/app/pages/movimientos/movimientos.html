@@ -108,7 +108,7 @@
                 <div class="form-row" *ngIf="tipoMovimiento === 'ENTRADA'">
                     <div class="form-group">
                         <label class="form-label">Nro. Lote *</label>
-                        <input type="text" class="form-control" [(ngModel)]="movimientoActual.nro_lote" name="nro_lote">
+                        <input type="text" class="form-control" [(ngModel)]="movimientoActual.nro_lote" name="nro_lote" maxlength="50">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Vencimiento *</label>
@@ -118,7 +118,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Observación / Motivo</label>
-                    <input type="text" class="form-control" [(ngModel)]="movimientoActual.observacion" name="observacion">
+                    <input type="text" class="form-control" [(ngModel)]="movimientoActual.observacion" name="observacion" maxlength="150">
                 </div>
 
                 <div class="modal-footer">

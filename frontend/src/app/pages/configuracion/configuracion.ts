@@ -31,6 +31,18 @@ export class ConfiguracionComponent implements OnInit {
     }
 
     guardar() {
+        if (!this.config.confnombre_empresa?.trim()) {
+            alert('El nombre de la empresa es obligatorio');
+            return;
+        }
+        if (!this.config.confruc?.trim()) {
+            alert('El RUC es obligatorio');
+            return;
+        }
+        if (this.config.confiva_porcentaje === null || this.config.confiva_porcentaje < 0) {
+            alert('El porcentaje de IVA debe ser un número válido (0 o más)');
+            return;
+        }
         this.guardando = true;
         this.mensaje = '';
         this.api.updateConfiguracion(this.config).subscribe({

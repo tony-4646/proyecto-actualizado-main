@@ -4,6 +4,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { ApiService } from './services/api.service';
+import { NotificacionesService } from './services/notificaciones.service';
 
 @Component({
   selector: 'app-root',
@@ -19,25 +20,36 @@ export class App implements OnInit {
   darkMode = false;
 
 
-  constructor(public auth: AuthService, private api: ApiService, private router: Router) { }
+  constructor(public auth: AuthService, private api: ApiService, private router: Router, private notifService: NotificacionesService) { }
 
   ngOnInit() {
     this.darkMode = localStorage.getItem('darkMode') === 'true';
     this.applyTheme();
-
-    if (this.auth.isLoggedIn) {
-      this.cargarNotificaciones();
-    }
+    this.notifService.notificacionCambio.subscribe(() => {
+      if (this.auth.isLoggedIn) {
+        this.cargarNotificaciones();
+      }
+    });
     this.auth.usuario$.subscribe(user => {
-      if (user) this.cargarNotificaciones();
-      else this.notificaciones = [];
+      if (user) {
+        this.cargarNotificaciones();
+      } else {
+        this.notificaciones = [];
+        this.notifOpen = false;
+      }
     });
   }
 
   cargarNotificaciones() {
     this.api.getProductosStockBajo().subscribe({
-      next: (data) => this.notificaciones = data || [],
-      error: () => this.notificaciones = []
+      next: (data) => {
+        this.notificaciones = data || [];
+        console.log('Campana actualizada:', this.notificaciones.length, 'alertas');
+      },
+      error: (err) => {
+        console.error('Error cargando notificaciones', err);
+        this.notificaciones = [];
+      }
     });
   }
 

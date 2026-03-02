@@ -84,6 +84,14 @@ export class ClientesComponent implements OnInit {
             return;
         }
 
+        if (this.clienteActual.cliemail && this.clienteActual.cliemail.trim() !== '') {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(this.clienteActual.cliemail)) {
+                alert('El formato del correo electrónico no es válido');
+                return;
+            }
+        }
+
         const data = {
             nombre: this.clienteActual.clinombre,
             cidruc: this.clienteActual.clicidruc,

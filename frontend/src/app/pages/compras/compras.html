@@ -77,7 +77,7 @@
                     <div class="card-body">
                         <div class="search-container">
                             <input type="text" class="form-control" placeholder="Buscar producto por nombre o código..."
-                                [(ngModel)]="busquedaProducto" (input)="buscarProducto()">
+                                [(ngModel)]="busquedaProducto" (input)="buscarProducto()" maxlength="150">
                             <div class="search-results" *ngIf="productosFiltrados.length > 0">
                                 <div *ngFor="let p of productosFiltrados" class="result-item" (click)="agregarItem(p)">
                                     <strong>{{ p.prodnombre }}</strong>
@@ -92,7 +92,7 @@
                     <div class="card-body">
                         <label class="form-label">Observación:</label>
                         <textarea class="form-control" rows="2" [(ngModel)]="observacion"
-                            placeholder="Notas de la compra..."></textarea>
+                            placeholder="Notas de la compra..." maxlength="150"></textarea>
                     </div>
                 </div>
             </div>
