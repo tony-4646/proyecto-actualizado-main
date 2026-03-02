@@ -1,4 +1,4 @@
-Examen final G5 - Micro.EC, sistema de gestión de inventarios, V1.0
+Examen final grupo 4, quinto semestre - Micro.EC, sistema de gestión de inventarios, V1.0
 
 - Trabajado con Node y Angular.
 - Generación de facturas e informes.
