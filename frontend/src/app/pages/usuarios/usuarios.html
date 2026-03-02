@@ -1,0 +1,175 @@
+<div class="page-usuarios">
+    <header class="page-header">
+        <h1>
+            <ng-container *ngIf="auth.rolNombre === 'Administrador'; else esPerfil">
+                Gestión de Usuarios
+            </ng-container>
+            <ng-template #esPerfil>
+                Mi Perfil
+            </ng-template>
+        </h1>
+
+        <button *ngIf="auth.rolNombre === 'Administrador'" class="btn btn-primary" (click)="abrirModal()">
+            + Nuevo Usuario
+        </button>
+    </header>
+
+    <div class="card">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let u of usuarios">
+                        <td>{{ u.usuid }}</td>
+                        <td>
+                            <strong>{{ u.usuusuario }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="getRolClass(u.rolnombre)">
+                                {{ u.rolnombre }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="u.usuactivo ? 'badge-success' : 'badge-danger'">
+                                {{ u.usuactivo ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>{{ u.usucreacion | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-sm btn-secondary" (click)="abrirModal(u)" title="Editar">
+                                    Editar
+                                </button>
+
+                                <button class="btn btn-sm btn-warning" (click)="abrirModalPassword(u)"
+                                    title="Cambiar Contraseña">
+                                    Clave
+                                </button>
+
+                                <button class="btn btn-sm btn-danger" (click)="eliminar(u)" title="Eliminar"
+                                    *ngIf="auth.rolNombre === 'Administrador' && u.usuid !== 1">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="usuarios.length === 0 && !loading" class="empty-state">
+                No hay usuarios registrados
+            </div>
+            <div *ngIf="loading" class="empty-state">
+                Cargando...
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="modalOpen" (click)="cerrarModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ editando ? 'Editar' : 'Nuevo' }} Usuario</h3>
+                <button class="modal-close" (click)="cerrarModal()">&times;</button>
+            </div>
+
+            <form (ngSubmit)="guardar()">
+                <div class="form-group">
+                    <label class="form-label">Nombre de Usuario *</label>
+                    <input type="text" class="form-control" [(ngModel)]="usuarioActual.usuusuario" name="usuusuario"
+                        required placeholder="Ej: cajero2">
+                </div>
+
+                <div class="form-group"
+                    *ngIf="!editando || (editando && (auth.rolNombre !== 'Administrador' || usuarioActual.usuid === auth.usuario?.usuid))">
+                    <label class="form-label">
+                        {{ editando ? 'Confirmar con Contraseña Actual *' : 'Contraseña *' }}
+                    </label>
+                    <input type="password" class="form-control" [(ngModel)]="usuarioActual.contrasena" name="contrasena"
+                        required [placeholder]="editando ? 'Ingrese su clave para guardar' : 'Mínimo 5 caracteres'">
+
+                    <small *ngIf="editando" class="text-muted">
+                        {{ auth.rolNombre === 'Administrador' ? 'Confirmación de identidad requerida para cambios en tu
+                        cuenta.' : 'Necesario para confirmar el cambio de nombre.' }}
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Rol *</label>
+                    <select class="form-control" [(ngModel)]="usuarioActual.rolid" name="rolid" required>
+                        <option [ngValue]="null" disabled>-- Seleccionar Rol --</option>
+
+                        <option *ngFor="let r of rolesFiltrados" [ngValue]="r.rolid">
+                            {{ r.rolnombre }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="rol-info" *ngIf="usuarioActual.rolid">
+                    <div class="info-box" *ngIf="usuarioActual.rolid == 1">
+                        <strong>Administrador:</strong> Acceso total y permanente. Este rol no puede ser modificado para
+                        garantizar el acceso al sistema.
+                    </div>
+                    <div class="info-box" *ngIf="usuarioActual.rolid == 2">
+                        <strong>Cajero:</strong> Acceso a Ventas, Movimientos, Clientes y Productos (consulta)
+                    </div>
+                    <div class="info-box" *ngIf="usuarioActual.rolid == 3">
+                        <strong>Bodeguero:</strong> Acceso a Productos, Movimientos, Categorías y Proveedores
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        {{ editando ? 'Guardar Cambios' : 'Crear Usuario' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cambiar Contraseña -->
+    <div class="modal-backdrop" *ngIf="modalPasswordOpen" (click)="cerrarModalPassword()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Cambiar Contraseña</h3>
+                <button class="modal-close" (click)="cerrarModalPassword()">&times;</button>
+            </div>
+
+            <form (ngSubmit)="cambiarContrasena()">
+                <p class="password-info">Cambiando contraseña para: <strong>{{ passwordUsuarioNombre }}</strong></p>
+
+                <div class="form-group">
+                    <label class="form-label">Contraseña Actual *</label>
+                    <input type="password" class="form-control" [(ngModel)]="contrasenaActual" name="contrasenaActual"
+                        required placeholder="Ingrese la contraseña actual">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nueva Contraseña *</label>
+                    <input type="password" class="form-control" [(ngModel)]="nuevaContrasena" name="nuevaContrasena"
+                        required placeholder="Mínimo 5 caracteres">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirmar Contraseña *</label>
+                    <input type="password" class="form-control" [(ngModel)]="confirmarContrasena"
+                        name="confirmarContrasena" required placeholder="Repita la contraseña">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="cerrarModalPassword()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

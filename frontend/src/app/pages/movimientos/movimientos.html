@@ -1,0 +1,166 @@
+<div class="page-movimientos">
+    <header class="page-header">
+        <h1>Movimientos de Inventario</h1>
+        <div class="header-actions">
+            <button class="btn btn-success" (click)="abrirModal('ENTRADA')">+ Compra</button>
+            <button class="btn btn-primary" (click)="abrirModal('SALIDA')">- Venta Manual</button>
+            <button class="btn btn-danger" (click)="abrirModal('PERDIDA')">- Pérdida / Desecho</button>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Kardex General</h3>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Cant.</th>
+                        <th>Saldo Ant.</th>
+                        <th>Saldo Act.</th>
+                        <th>Usuario</th>
+                        <th>Info.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let m of movimientos">
+                        <td>{{ m.karfecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td>
+                            <strong>{{ m.prodnombre }}</strong>
+                            <small class="text-muted d-block">{{ m.prodcodigo }}</small>
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="getTipoBadgeClass(m.kartipo)">
+                                {{ m.kartipo }}
+                            </span>
+                        </td>
+                        <td>{{ m.karcantidad }}</td>
+                        <td class="text-center">{{ m.karsaldo_anterior }}</td>
+                        <td class="text-center"><strong>{{ m.karsaldo_actual }}</strong></td>
+                        
+                        <td>{{ m.usuusuario || '-' }}</td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-sm btn-secondary" (click)="verDetalle(m)" title="Ver Detalle">
+                                Ver
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="movimientos.length === 0" class="empty-state">
+                No hay movimientos registrados
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="modalOpen">
+        <div class="modal modal-lg" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>
+                    <span *ngIf="tipoMovimiento === 'ENTRADA'" class="text-success">+ Registro de Compra</span>
+                    <span *ngIf="tipoMovimiento === 'SALIDA'" class="text-primary">- Salida Manual</span>
+                    <span *ngIf="tipoMovimiento === 'PERDIDA'" class="text-danger">- Registro de Pérdida</span>
+                </h3>
+                <button class="modal-close" (click)="cerrarModal()">&times;</button>
+            </div>
+
+            <div *ngIf="resultado" class="resultado-box">
+                <div class="alert alert-success"><strong>{{ resultado.mensaje }}</strong></div>
+                <button class="btn btn-primary" (click)="cerrarModal()">Entendido</button>
+            </div>
+
+            <form *ngIf="!resultado" (ngSubmit)="registrar()">
+                <div class="form-group">
+                    <label class="form-label">Producto *</label>
+                    <select class="form-control" [(ngModel)]="movimientoActual.producto_id" name="producto_id" (change)="onProductoChange()" required>
+                        <option [value]="null">-- Seleccionar producto --</option>
+                        <option *ngFor="let p of productos" [value]="p.prodid">{{ p.prodnombre }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group" *ngIf="productoSeleccionado && tipoMovimiento !== 'ENTRADA'">
+                    <label class="form-label">Lote de Origen *</label>
+                    <select class="form-control" [(ngModel)]="movimientoActual.lotid" name="lotid" required>
+                        <option [value]="null">-- Seleccionar Lote --</option>
+                        <option *ngFor="let lote of lotes" [value]="lote.lotid">
+                            Lote: {{ lote.lotnro_lote }} | Disp: {{ lote.lotcantidad_actual }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cantidad *</label>
+                        <input type="number" min="1" class="form-control" [(ngModel)]="movimientoActual.cantidad" name="cantidad" required>
+                    </div>
+                    <div class="form-group" *ngIf="tipoMovimiento === 'ENTRADA'">
+                        <label class="form-label">Costo Compra $</label>
+                        <input type="number" step="0.01" class="form-control" [(ngModel)]="movimientoActual.costo_compra" name="costo_compra">
+                    </div>
+                </div>
+
+                <div class="form-row" *ngIf="tipoMovimiento === 'ENTRADA'">
+                    <div class="form-group">
+                        <label class="form-label">Nro. Lote *</label>
+                        <input type="text" class="form-control" [(ngModel)]="movimientoActual.nro_lote" name="nro_lote">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Vencimiento *</label>
+                        <input type="date" class="form-control" [(ngModel)]="movimientoActual.fecha_vencimiento" name="fecha_vencimiento">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Observación / Motivo</label>
+                    <input type="text" class="form-control" [(ngModel)]="movimientoActual.observacion" name="observacion">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn" [ngClass]="tipoMovimiento === 'ENTRADA' ? 'btn-success' : 'btn-primary'" [disabled]="loading">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="modalDetalleOpen">
+        <div class="modal modal-md" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Detalles del Registro</h3>
+                <button class="modal-close" (click)="cerrarModalDetalle()">&times;</button>
+            </div>
+           <div class="modal-body" *ngIf="movimientoSeleccionado">
+    <div class="detalle-ficha">
+        <div class="detalle-item">
+            <span class="label" style="display: block; margin-bottom: 8px; font-weight: bold;">Observación / Motivo:</span>
+            <p class="value" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid #444; color: #e0e0e0; min-height: 50px;">
+                {{ movimientoSeleccionado.karobservacion || movimientoSeleccionado.observacion || 'Sin observaciones registradas.' }}
+            </p>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
+
+        <div class="detalle-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="detalle-item">
+                <span class="label" style="color: #aaa; font-size: 0.9em;">Número de Lote:</span><br>
+                <span class="value"><strong>{{ movimientoSeleccionado.lotnro_lote || 'N/A' }}</strong></span>
+            </div>
+            <div class="detalle-item">
+                <span class="label" style="color: #aaa; font-size: 0.9em;">Proveedor:</span><br>
+                <span class="value">{{ movimientoSeleccionado.provnombre || 'No aplica' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" (click)="cerrarModalDetalle()">Cerrar Detalle</button>
+            </div>
+        </div>
+    </div>
+</div>

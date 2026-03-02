@@ -1,0 +1,150 @@
+
+<div *ngIf="!auth.isLoggedIn">
+  <router-outlet></router-outlet>
+</div>
+
+<div class="app-container" *ngIf="auth.isLoggedIn">
+
+  <aside class="sidebar" [class.active]="menuOpen">
+    <div class="sidebar-brand">
+      <span>Micro.EC</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item"
+        (click)="menuOpen = false">
+        📊 Dashboard
+      </a>
+
+      <a routerLink="/productos" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('productos')"
+        (click)="menuOpen = false">
+        📦 Productos
+      </a>
+
+      <a routerLink="/categorias" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('categorias')"
+        (click)="menuOpen = false">
+        🏷️ Categorías
+      </a>
+
+      <a routerLink="/ventas" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('ventas')"
+        (click)="menuOpen = false">
+        🧾 Ventas
+      </a>
+
+      <a routerLink="/compras" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('compras')"
+        (click)="menuOpen = false">
+        🛍️ Compras
+      </a>
+
+      <a routerLink="/clientes" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('clientes')"
+        (click)="menuOpen = false">
+        🧑‍💼 Clientes
+      </a>
+
+      <a routerLink="/movimientos" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('movimientos')"
+        (click)="menuOpen = false">
+        📋 Movimientos
+      </a>
+
+      <a routerLink="/proveedores" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('proveedores')"
+        (click)="menuOpen = false">
+        🚚 Proveedores
+      </a>
+
+      <a routerLink="/descuentos" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('descuentos')"
+        (click)="menuOpen = false">
+        🏷️ Descuentos
+      </a>
+
+      <a routerLink="/reportes" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('reportes')"
+        (click)="menuOpen = false">
+        📈 Reportes
+      </a>
+
+      <a routerLink="/usuarios" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('usuarios')"
+        (click)="menuOpen = false">
+        👥 Usuarios
+      </a>
+
+
+      <div class="nav-separator" *ngIf="auth.tieneAcceso('configuracion')">Sistema</div>
+
+      <a routerLink="/configuracion" routerLinkActive="active" class="nav-item"
+        *ngIf="auth.tieneAcceso('configuracion')" (click)="menuOpen = false">
+        ⚙️ Configuración
+      </a>
+
+      <a routerLink="/auditoria" routerLinkActive="active" class="nav-item" *ngIf="auth.tieneAcceso('auditoria')"
+        (click)="menuOpen = false">
+        📝 Auditoría
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile-mini">
+        <div class="role-badge" [ngClass]="{
+                    'role-admin': auth.rolNombre === 'Administrador',
+                    'role-cajero': auth.rolNombre === 'Cajero',
+                    'role-bodeguero': auth.rolNombre === 'Bodeguero'
+                }">
+          {{ auth.rolNombre }}
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+
+    <header class="top-header">
+      <button class="header-toggle" (click)="toggleMenu()">☰</button>
+
+
+
+      <div class="header-user">
+        <button class="theme-btn" (click)="toggleDarkMode()" [title]="darkMode ? 'Modo Claro' : 'Modo Oscuro'"style="color: green;">
+          {{ darkMode ? 'Claro' : 'Oscuro' }}
+        </button>
+
+        <div class="notif-wrapper">
+          <button class="notif-btn" (click)="toggleNotif()" title="Notificaciones">
+            🔔
+            <span class="notif-badge" *ngIf="notificaciones.length > 0">{{ notificaciones.length }}</span>
+          </button>
+          <div class="notif-dropdown" *ngIf="notifOpen">
+            <div class="notif-header">
+              <strong>⚠️ Alertas de Stock</strong>
+            </div>
+            <div *ngIf="notificaciones.length === 0" class="notif-empty">
+              Sin alertas
+            </div>
+            <div class="notif-list">
+              <div *ngFor="let n of notificaciones.slice(0, 8)" class="notif-item">
+                <span class="notif-product">{{ n.prodnombre || n.nombre }}</span>
+                <span class="notif-stock badge badge-danger">{{ n.prodstock_global || n.stock_actual }} un.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="user-info text-right">
+          <span class="user-name">{{ auth.usuario?.usuusuario }}</span>
+          <span class="user-role">{{ auth.rolNombre }}</span>
+        </div>
+        <div class="user-avatar" [ngClass]="{
+                    'avatar-admin': auth.rolNombre === 'Administrador',
+                    'avatar-cajero': auth.rolNombre === 'Cajero',
+                    'avatar-bodeguero': auth.rolNombre === 'Bodeguero'
+                }">{{ getIniciales() }}</div>
+        <button class="btn-logout" (click)="logout()" title="Cerrar Sesión">
+          Cerrar Sesión
+        </button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

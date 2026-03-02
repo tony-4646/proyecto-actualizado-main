@@ -1,0 +1,42 @@
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Micro.EC</h1>
+            <p>Sistema de Gestión de Inventario 2.0</p>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" class="login-form">
+            <div class="form-group">
+                <label class="form-label">Usuario</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="text" class="form-control" [(ngModel)]="usuario" name="usuario"
+                        placeholder="Ingresa tu usuario" autocomplete="username" autofocus [disabled]="loading" maxlength="50">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Contraseña</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" class="form-control" [(ngModel)]="contrasena" name="contrasena"
+                        placeholder="Ingresa tu contraseña" autocomplete="current-password" [disabled]="loading" maxlength="50">
+                </div>
+            </div>
+
+            @if (error) {
+                <div class="error-message">
+                    ⚠️ {{ error }}
+                </div>
+            }
+
+            <button type="submit" class="btn-login" [disabled]="loading">
+                @if (!loading) {
+                    <span>Iniciar Sesión</span>
+                } @else {
+                    <span>Ingresando...</span>
+                }
+            </button>
+        </form>
+    </div>
+</div>

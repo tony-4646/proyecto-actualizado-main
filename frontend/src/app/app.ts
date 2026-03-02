@@ -1,0 +1,71 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from './services/auth.service';
+import { ApiService } from './services/api.service';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, FormsModule],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App implements OnInit {
+  menuOpen = false;
+  notificaciones: any[] = [];
+  notifOpen = false;
+  darkMode = false;
+
+
+  constructor(public auth: AuthService, private api: ApiService, private router: Router) { }
+
+  ngOnInit() {
+    this.darkMode = localStorage.getItem('darkMode') === 'true';
+    this.applyTheme();
+
+    if (this.auth.isLoggedIn) {
+      this.cargarNotificaciones();
+    }
+    this.auth.usuario$.subscribe(user => {
+      if (user) this.cargarNotificaciones();
+      else this.notificaciones = [];
+    });
+  }
+
+  cargarNotificaciones() {
+    this.api.getProductosStockBajo().subscribe({
+      next: (data) => this.notificaciones = data || [],
+      error: () => this.notificaciones = []
+    });
+  }
+
+  toggleNotif() { this.notifOpen = !this.notifOpen; }
+
+  toggleMenu() { this.menuOpen = !this.menuOpen; }
+
+  logout() {
+    this.auth.logout();
+    this.menuOpen = false;
+    this.notifOpen = false;
+  }
+
+  getIniciales(): string {
+    const nombre = this.auth.usuario?.usuusuario || '';
+    return nombre.substring(0, 2).toUpperCase();
+  }
+
+  // ======= Dark Mode =======
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+    localStorage.setItem('darkMode', String(this.darkMode));
+    this.applyTheme();
+  }
+
+  applyTheme() {
+    document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
+  }
+
+
+}
